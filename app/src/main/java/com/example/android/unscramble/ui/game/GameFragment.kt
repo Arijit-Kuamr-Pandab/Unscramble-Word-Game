@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import com.example.android.unscramble.Architecture_Components.GameViewModel
 import com.example.android.unscramble.R
 import com.example.android.unscramble.databinding.GameFragmentBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 /**
  * Fragment where the game is played, contains the game logic.
@@ -66,8 +67,8 @@ class GameFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Setup a click listener for the Submit and Skip buttons.
-//        binding.submit.setOnClickListener { onSubmitWord() }
-//        binding.skip.setOnClickListener { onSkipWord() }
+        binding.submit.setOnClickListener { onSubmitWord() }
+        binding.skip.setOnClickListener { onSkipWord() }
         // Update the UI
         updateNextWordOnScreen()
         binding.score.text = getString(R.string.score, 0)
@@ -79,27 +80,28 @@ class GameFragment : Fragment() {
     * Checks the user's word, and updates the score accordingly.
     * Displays the next scrambled word.
     */
-//    private fun onSubmitWord() {
+    private fun onSubmitWord() {
 //        currentScrambledWord = getNextScrambledWord()
 //        currentWordCount++
 //        score += SCORE_INCREASE
-//        binding.wordCount.text = getString(R.string.word_count, currentWordCount, MAX_NO_OF_WORDS)
-//        binding.score.text = getString(R.string.score, score)
-//        setErrorTextField(false)
-//        updateNextWordOnScreen()
-//    }
+        viewModel.getNextWord()
+        binding.wordCount.text = getString(R.string.word_count, viewModel.currentWordCount, MAX_NO_OF_WORDS)
+        binding.score.text = getString(R.string.score, viewModel.score)
+        setErrorTextField(false)
+        updateNextWordOnScreen()
+    }
 
     /*
      * Skips the current word without changing the score.
      * Increases the word count.
      */
-//    private fun onSkipWord() {
+    private fun onSkipWord() {
 //        currentScrambledWord = getNextScrambledWord()
 //        currentWordCount++
-//        binding.wordCount.text = getString(R.string.word_count, currentWordCount, MAX_NO_OF_WORDS)
-//        setErrorTextField(false)
-//        updateNextWordOnScreen()
-//    }
+        binding.wordCount.text = getString(R.string.word_count, viewModel.currentWordCount, MAX_NO_OF_WORDS)
+        setErrorTextField(false)
+        updateNextWordOnScreen()
+    }
 
     /*
      * Gets a random word for the list of words and shuffles the letters in it.
@@ -144,5 +146,19 @@ class GameFragment : Fragment() {
      */
     private fun updateNextWordOnScreen() {
         binding.textViewUnscrambledWord.text = viewModel.currentScrambledWord
+    }
+
+    private fun showFinalScoreDialog(){
+        MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.congratulations))
+                .setMessage(getString(R.string.you_scored, viewModel.score))
+                .setCancelable(false)   //For making alert dialog not cancelable when the back key is pressed
+                .setNegativeButton(getString(R.string.exit)){ _, _ ->
+                    exitGame()
+                }
+                .setPositiveButton(getString(R.string.play_again)){_, _ ->
+                    restartGame()
+                }
+                .show()
     }
 }
