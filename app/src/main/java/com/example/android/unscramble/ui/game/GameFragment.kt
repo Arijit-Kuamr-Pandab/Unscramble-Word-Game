@@ -49,13 +49,10 @@ class GameFragment : Fragment() {
     ): View {
         // Inflate the layout XML file and return a binding object instance
         binding = GameFragmentBinding.inflate(inflater, container, false)
-        Log.d("GameFragment", "GameFragment created/re-created!....onCreateView inside fragment")
+        Log.d("GameFragment", "GameFragment created/re-created!")
+        Log.d("GameFragment", "Word: ${viewModel.currentScrambledWord} " +
+                "Score: ${viewModel.score} WordCount: ${viewModel.currentWordCount}")
         return binding.root
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.d("GameFragment", "GameFragment destroyed!.... On Detach inside Fragment")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,16 +71,14 @@ class GameFragment : Fragment() {
     /*
     * Checks the user's word, and updates the score accordingly.
     * Displays the next scrambled word.
+    * After the last word, the user is shown a Dialog with the final score.
     */
     private fun onSubmitWord() {
-        binding.wordCount.text = getString(R.string.word_count, viewModel.currentWordCount, MAX_NO_OF_WORDS)
-        binding.score.text = getString(R.string.score, viewModel.score)
-
         val playerWord = binding.textInputEditText.text.toString()
 
-        if (viewModel.isUserWordCorrect(playerWord)){
+        if (viewModel.isUserWordCorrect(playerWord)) {
             setErrorTextField(false)
-            if (viewModel.nextWord()){
+            if (viewModel.nextWord()) {
                 updateNextWordOnScreen()
             } else {
                 showFinalScoreDialog()
@@ -94,12 +89,10 @@ class GameFragment : Fragment() {
     }
 
     /*
-     * Skips the current word without changing the score.
-     * Increases the word count.
-     */
+    * Skips the current word without changing the score.
+    */
     private fun onSkipWord() {
-        binding.wordCount.text = getString(R.string.word_count, viewModel.currentWordCount, MAX_NO_OF_WORDS)
-        if (viewModel.nextWord()){
+        if (viewModel.nextWord()) {
             setErrorTextField(false)
             updateNextWordOnScreen()
         } else {
@@ -117,13 +110,29 @@ class GameFragment : Fragment() {
     }
 
     /*
+    * Creates and shows an AlertDialog with the final score.
+    */
+    private fun showFinalScoreDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.congratulations))
+                .setMessage(getString(R.string.you_scored, viewModel.score))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.exit)) { _, _ ->
+                    exitGame()
+                }
+                .setPositiveButton(getString(R.string.play_again)) { _, _ ->
+                    restartGame()
+                }
+                .show()
+    }
+
+    /*
      * Re-initializes the data in the ViewModel and updates the views with the new data, to
      * restart the game.
      */
     private fun restartGame() {
-        viewModel.reInitializedata()
+        viewModel.reinitializeData()
         setErrorTextField(false)
-        //binding.score.text = getString(R.string.word_count,viewModel.currentWordCount)
         updateNextWordOnScreen()
     }
 
@@ -132,6 +141,11 @@ class GameFragment : Fragment() {
      */
     private fun exitGame() {
         activity?.finish()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        Log.d("GameFragment", "GameFragment destroyed!")
     }
 
     /*
@@ -153,21 +167,4 @@ class GameFragment : Fragment() {
     private fun updateNextWordOnScreen() {
         binding.textViewUnscrambledWord.text = viewModel.currentScrambledWord
     }
-
-
-    //  Dialog code starts here
-    private fun showFinalScoreDialog(){
-        MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.congratulations))
-                .setMessage(getString(R.string.you_scored, viewModel.score))
-                .setCancelable(false)   //For making alert dialog not cancelable when the back key is pressed
-                .setNegativeButton(getString(R.string.exit)){ _, _ ->
-                    exitGame()
-                }
-                .setPositiveButton(getString(R.string.play_again)){_, _ ->
-                    restartGame()
-                }
-                .show()
-    }
-    //  Dialog code ends here
 }
