@@ -3,6 +3,7 @@ package com.example.android.unscramble.Architecture_Components
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.android.unscramble.ui.game.MAX_NO_OF_WORDS
+import com.example.android.unscramble.ui.game.SCORE_INCREASE
 import com.example.android.unscramble.ui.game.allWordsList
 
 class GameViewModel: ViewModel() {
@@ -19,6 +20,7 @@ class GameViewModel: ViewModel() {
     val currentScrambledWord: String get() = _currentScrambledWord
 
     init {
+        Log.d("GameFragment","GameViewModel Created!")
         getNextWord()
     }
 
@@ -31,7 +33,7 @@ class GameViewModel: ViewModel() {
         currentWord = allWordsList.random()
         val tempWord = currentWord.toCharArray()
         tempWord.shuffle()
-        if(currentWord.equals(tempWord)){
+        while (tempWord.toString().equals(currentWord, false)) {
             tempWord.shuffle()
         }
         if (wordList.contains(currentWord)){
@@ -39,13 +41,14 @@ class GameViewModel: ViewModel() {
         } else {
             _currentScrambledWord = String(tempWord)
             _currentWordCount++
+            //_score += SCORE_INCREASE
             wordList.add(currentWord)
         }
 
     }
 
     fun nextWord(): Boolean{
-        return if (currentWordCount< MAX_NO_OF_WORDS){
+        return if (_currentWordCount< MAX_NO_OF_WORDS){
             getNextWord()
             true
         } else {
@@ -53,12 +56,22 @@ class GameViewModel: ViewModel() {
         }
     }
 
-    fun updateWordCount():Int{
-        return _currentWordCount++
+    private fun increaseScore(){
+        _score += SCORE_INCREASE
     }
 
-    fun updateScore():Int{
-        return _score++
+    fun isUserWordCorrect(playerWord: String): Boolean{
+        if (currentWord.equals(playerWord)){
+            increaseScore()
+            return true
+        }
+        return false
     }
 
+    fun reInitializedata(){
+        _score = 0
+        _currentWordCount = 0
+        wordList.clear()
+        getNextWord()
+    }
 }
