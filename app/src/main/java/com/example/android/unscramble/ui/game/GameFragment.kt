@@ -24,8 +24,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
-import com.example.android.unscramble.Architecture_Components.GameViewModel
 import com.example.android.unscramble.R
 import com.example.android.unscramble.databinding.GameFragmentBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -73,20 +71,23 @@ class GameFragment : Fragment() {
         binding.submit.setOnClickListener { onSubmitWord() }
         binding.skip.setOnClickListener { onSkipWord() }
 
-        // LiveData observer for Score
-        viewModel.score.observe(viewLifecycleOwner,{ newScore->
-            binding.score.text = getString(R.string.score, newScore)
-        })
 
-        // LiveData observer for newWordCount
-        viewModel.currentWordCount.observe(viewLifecycleOwner,{ newWordCount->
-            binding.wordCount.text = getString(R.string.word_count, newWordCount, MAX_NO_OF_WORDS)
-        })
-
-        // LiveData observer for newUnscrambledWord
-        viewModel.currentScrambledWord.observe(viewLifecycleOwner,{ newWord->
-            binding.textViewUnscrambledWord.text = newWord
-        })
+        // I don't need these observers as our layout receives the updates of the changes to the LiveData directly.
+        // I am keeping these in comments, as a reference for future.
+//        // LiveData observer for Score
+//        viewModel.score.observe(viewLifecycleOwner,{ newScore->
+//            binding.score.text = getString(R.string.score, newScore)
+//        })
+//
+//        // LiveData observer for newWordCount
+//        viewModel.currentWordCount.observe(viewLifecycleOwner,{ newWordCount->
+//            binding.wordCount.text = getString(R.string.word_count, newWordCount, MAX_NO_OF_WORDS)
+//        })
+//
+//        // LiveData observer for newUnscrambledWord
+//        viewModel.currentScrambledWord.observe(viewLifecycleOwner,{ newWord->
+//            binding.textViewUnscrambledWord.text = newWord
+//        })
     }
 
     /*
@@ -181,5 +182,4 @@ class GameFragment : Fragment() {
             binding.textInputEditText.text = null
         }
     }
-
 }
