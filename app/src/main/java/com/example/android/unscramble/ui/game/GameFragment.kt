@@ -21,6 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
@@ -48,7 +49,10 @@ class GameFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         // Inflate the layout XML file and return a binding object instance
-        binding = GameFragmentBinding.inflate(inflater, container, false)
+//        binding = GameFragmentBinding.inflate(inflater, container, false) // This is for viewBindinng
+
+        binding = DataBindingUtil.inflate(inflater, R.layout.game_fragment, container, false) // This is for dataBindiing
+
         Log.d("GameFragment", "GameFragment created/re-created!")
         Log.d("GameFragment", "Word: ${viewModel.currentScrambledWord} " +
                 "Score: ${viewModel.score} WordCount: ${viewModel.currentWordCount}")
@@ -62,10 +66,7 @@ class GameFragment : Fragment() {
         binding.submit.setOnClickListener { onSubmitWord() }
         binding.skip.setOnClickListener { onSkipWord() }
 
-        binding.score.text = getString(R.string.score, 0)
-        binding.wordCount.text = getString(
-                R.string.word_count, 0, MAX_NO_OF_WORDS)
-
+        // Observer of LiveData
         viewModel.score.observe(viewLifecycleOwner,{ newScore->
             binding.score.text = getString(R.string.score, newScore)
         })
@@ -120,6 +121,9 @@ class GameFragment : Fragment() {
     /*
     * Creates and shows an AlertDialog with the final score.
     */
+
+
+    // Alert Dialog Starts here
     private fun showFinalScoreDialog() {
         MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.congratulations))
@@ -133,6 +137,7 @@ class GameFragment : Fragment() {
                 }
                 .show()
     }
+    //Alert Dialog ends here
 
     /*
      * Re-initializes the data in the ViewModel and updates the views with the new data, to
