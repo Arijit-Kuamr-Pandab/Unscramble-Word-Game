@@ -62,19 +62,28 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // dataBinding variables
+        binding.gameViewModel = viewModel
+        binding.maxNoOfWords = MAX_NO_OF_WORDS
+        // Specify the fragment view as the lifecycle owner of the binding.
+        // This is used so that the binding can observe LiveData updates
+        binding.lifecycleOwner = viewLifecycleOwner
+
         // Setup a click listener for the Submit and Skip buttons.
         binding.submit.setOnClickListener { onSubmitWord() }
         binding.skip.setOnClickListener { onSkipWord() }
 
-        // Observer of LiveData
+        // LiveData observer for Score
         viewModel.score.observe(viewLifecycleOwner,{ newScore->
             binding.score.text = getString(R.string.score, newScore)
         })
 
+        // LiveData observer for newWordCount
         viewModel.currentWordCount.observe(viewLifecycleOwner,{ newWordCount->
             binding.wordCount.text = getString(R.string.word_count, newWordCount, MAX_NO_OF_WORDS)
         })
 
+        // LiveData observer for newUnscrambledWord
         viewModel.currentScrambledWord.observe(viewLifecycleOwner,{ newWord->
             binding.textViewUnscrambledWord.text = newWord
         })
